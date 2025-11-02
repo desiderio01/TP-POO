@@ -35,3 +35,15 @@
 1533	1979	7837582981141153	tp.exe	7fe05dc8bc916b0e
 34	2003	7837586782211657	CMakeFiles/tp.dir/src/comandos.cpp.obj	76bf9e349e20a08f
 2004	2441	7837586801910657	tp.exe	7fe05dc8bc916b0e
+87	538	7837666203777897	CMakeFiles/tp.dir/src/planta.cpp.obj	f3f6f49d2d596ce7
+100	1897	7837666203917204	CMakeFiles/tp.dir/src/cacto.cpp.obj	e6635f3f746ae4c4
+52	1900	7837666203432687	CMakeFiles/tp.dir/src/celula.cpp.obj	13ebbe89dd595775
+134	1903	7837666204252288	CMakeFiles/tp.dir/src/ervadaninha.cpp.obj	2796915c0cac24a4
+148	1944	7837666204392313	CMakeFiles/tp.dir/src/plantaexotica.cpp.obj	2fcafc78c8738ca9
+112	1985	7837666204035701	CMakeFiles/tp.dir/src/roseira.cpp.obj	819f432407d7d9f9
+63	2195	7837666203544473	CMakeFiles/tp.dir/src/jardineiro.cpp.obj	b61c1a3c4e45ffb3
+23	2233	7837666203143356	CMakeFiles/tp.dir/src/main.cpp.obj	aa92e0d4d10c4cb2
+40	2310	7837666203316568	CMakeFiles/tp.dir/src/jardim.cpp.obj	d7c7567e6b98e21f
+74	2634	7837666203652277	CMakeFiles/tp.dir/src/comandos.cpp.obj	76bf9e349e20a08f
+9	809	7837667545374144	CMakeFiles/tp.dir/src/tesourapoda.cpp.obj	a8d03c5cdf5a3cb0
+810	1205	7837667553391000	tp.exe	7fe05dc8bc916b0e

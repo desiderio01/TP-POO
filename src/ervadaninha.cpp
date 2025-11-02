@@ -4,7 +4,6 @@
 
 #include "../include/ervadaninha.h"
 #include "../include/celula.h"
-#include <algorithm>  // para std::min
 
 ErvaDaninha::ErvaDaninha() : Planta(5, 5) {
     // Inicial: 5 água e 5 nutrientes
@@ -18,8 +17,9 @@ bool ErvaDaninha::tentarMultiplicar(Jardim* jardim, int lin, int col) {
     }
 
     int dirs[4][2] = { {-1,0}, {1,0}, {0,-1}, {0,1} };
-    for (auto& d : dirs) {
-        int nl = lin + d[0], nc = col + d[1];
+    for (int i = 0; i < 4; ++i) { // Loop C++ clássico
+        int nl = lin + dirs[i][0];
+        int nc = col + dirs[i][1];
         if (jardim->posicaoValida(nl, nc)) {
             Celula& cel_vizinha = jardim->getCelula(nl, nc);
 

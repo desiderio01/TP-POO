@@ -1,35 +1,20 @@
 #include "../include/comandos.h"
 #include <iostream>
 #include <sstream>
-#include <vector>
+// #include <vector> // REMOVIDO
 #include <cctype>
 #include <stdexcept>
 
 using namespace std;
 
-// Implementação do Destrutor
 Comando::~Comando() {
     delete jardim;
 }
 
-// Função Auxiliar: Tokenização (Parsing)
-std::vector<std::string> Comando::parseComando(const std::string& comando) const {
-    stringstream ss(comando);
-    vector<string> tokens;
-    string token;
-
-    while (ss >> token) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
-
-// Função Auxiliar: Conversão de Posição ("ej" -> 4, 9)
 Coordenadas Comando::stringParaPosicao(const std::string& pos) const {
     Coordenadas resultado;
     if (pos.length() != 2) return resultado;
     if (!std::islower(pos[0]) || !std::islower(pos[1])) {
-        // Erro: posição deve ser em minúsculas (conforme regra do enunciado)
         return resultado;
     }
     resultado.linha = pos[0] - 'a';
@@ -41,27 +26,42 @@ Coordenadas Comando::stringParaPosicao(const std::string& pos) const {
     return resultado;
 }
 
-void Comando::processar(const string& comando) {
-    if (comando.empty()) return;
-    vector<string> tokens = parseComando(comando);
-    if (tokens.empty()) return;
+// Assinatura alterada para bool
+bool Comando::processar(const string& comando) {
+    if (comando.empty()) return true; // Continua o loop
+
+    // NOVO: Parsing com array estático
+    const int MAX_TOKENS = 5; // Limite seguro de palavras por comando
+    string tokens[MAX_TOKENS];
+    int numTokens = 0;
+
+    stringstream ss(comando);
+    string token;
+    // Preenche o array de tokens
+    while (numTokens < MAX_TOKENS && ss >> token) {
+        tokens[numTokens] = token;
+        numTokens++;
+    }
+    if (numTokens == 0) return true;
+
     string nomeComando = tokens[0];
+
     // --- 1. VALIDAÇÃO: Comando 'jardim <n> <n>' ---
     if (nomeComando == "jardim") {
         if (jardim != nullptr) {
             cout << "Erro: O jardim ja foi criado. Este comando so pode ser executado uma vez." << endl;
-            return;
+            return true;
         }
-        if (tokens.size() != 3) {
+        if (numTokens != 3) {
             cout << "Sintaxe invalida para 'jardim'. Uso correto: jardim <linhas> <colunas>" << endl;
-            return;
+            return true;
         }
         try {
             int linhas = stoi(tokens[1]);
             int colunas = stoi(tokens[2]);
             if (linhas < 1 || linhas > 26 || colunas < 1 || colunas > 26) {
                 cout << "Erro: Dimensoes invalidas! Insira valores entre 1 e 26." << endl;
-                return;
+                return true;
             }
             jardim = new Jardim(linhas, colunas);
             cout << "\nJardim criado com sucesso: " << linhas << "x" << colunas << "." << endl;
@@ -69,70 +69,81 @@ void Comando::processar(const string& comando) {
         } catch (const std::exception& e) {
             cout << "Erro de sintaxe: As dimensoes devem ser numeros inteiros." << endl;
         }
-        return;
+        return true;
     }
+
     // --- 2. VALIDAÇÃO: Comando 'sair' ---
     if (nomeComando == "sair") {
-        if (tokens.size() != 1) {
+        if (numTokens != 1) {
              cout << "Erro: O comando 'sair' nao aceita parametros." << endl;
-             return;
+             return true;
         }
         cout << "Simulacao encerrada. Obrigado!" << endl;
-        exit(0);
+        return false; // <<< ALTERADO: Termina o loop no main
     }
+
     // --- VERIFICAÇÃO: JARDIM EXISTENTE ---
     if (jardim == nullptr) {
         cout << "Erro: O jardim ainda nao foi criado. Execute 'jardim <L> <C>' primeiro." << endl;
-        return;
+        return true;
     }
+
     // --- 3. VALIDAÇÃO: Comando 'entra <l><c>' ---
     if (nomeComando == "entra") {
-        if (tokens.size() != 2) {
+        if (numTokens != 2) {
             cout << "Sintaxe invalida para 'entra'. Uso correto: entra <posicao>" << endl;
-            return;
+            return true;
         }
         string posString = tokens[1];
         Coordenadas pos = stringParaPosicao(posString);
         if (!pos.valida) {
             cout << "Erro: Posicao '" << posString << "' em formato invalido. Use duas letras (ex: aa)." << endl;
-            return;
+            return true;
         }
-        // Validação Semântica: Posicao nos limites do jardim atual
         if (!jardim->posicaoValida(pos.linha, pos.coluna)) {
             cout << "Erro: Posicao '" << posString << "' esta fora dos limites do jardim ("
                  << jardim->posicaoParaString(jardim->getLinhas() - 1, jardim->getColunas() - 1) << ")." << endl;
-            return;
+            return true;
         }
         cout << "Validado! Jardineiro pronto para entrar na posicao " << posString << "." << endl;
         jardim->imprimir();
+        return true;
+
     // --- 4. VALIDAÇÃO: Comando 'avanca [n]' ---
     } else if (nomeComando == "avanca") {
-        if (tokens.size() > 2) {
+        if (numTokens > 2) {
             cout << "Sintaxe invalida para 'avanca'. Uso correto: avanca [n]" << endl;
-            return;
+            return true;
         }
         int instantes = 1;
-        if (tokens.size() == 2) {
+        if (numTokens == 2) {
             try {
                 instantes = stoi(tokens[1]);
                 if (instantes <= 0) {
                     cout << "Erro: O numero de instantes deve ser um valor inteiro positivo." << endl;
-                    return;
+                    return true;
                 }
             } catch (const std::exception& e) {
                 cout << "Erro: O parametro para 'avanca' deve ser um numero inteiro." << endl;
-                return;
+                return true;
             }
         }
         cout << "Validado! Avancando " << instantes << " instante(s)..." << endl;
         jardim->imprimir();
-    }else if (nomeComando == "planta") {
-        if (tokens.size() != 3) {
+        return true;
+
+    } else if (nomeComando == "planta") {
+        if (numTokens != 3) {
             cout << "Erro: uso correto: planta <pos> <tipo>" << endl;
             cout << "Exemplo: planta aa cacto" << endl;
-            return;
+            return true;
         }
+        // ... (A lógica de validação do 'planta' viria aqui) ...
+        return true;
+
     } else {
         cout << "Comando invalido! '" << nomeComando << "' nao e um comando reconhecido." << endl;
     }
+
+    return true; // Garante que o loop continua
 }

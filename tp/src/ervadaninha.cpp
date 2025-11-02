@@ -4,7 +4,6 @@
 
 #include "../include/ervadaninha.h"
 #include "../include/celula.h"
-#include <algorithm>  // para std::min
 
 ErvaDaninha::ErvaDaninha() : Planta(5, 5) {
     // Inicial: 5 água e 5 nutrientes

@@ -1,7 +1,3 @@
-//
-// Created by david on 02/11/2025.
-//
-
 #ifndef ERVADANINHA_H
 #define ERVADANINHA_H
 
@@ -22,6 +18,8 @@ public:
 
     // Tenta multiplicar, matando a planta vizinha se necessário
     bool tentarMultiplicar(Jardim* jardim, int lin, int col);
+
+    bool eFeia() const override { return true; }
 };
 
 #endif // ERVADANINHA_H

@@ -1,10 +1,5 @@
-//
-// Created by david on 01/11/2025.
-//
-
 #include "../include/cacto.h"
 #include "../include/celula.h"
-#include <algorithm>  // para std::min
 #include <cstdlib>
 
 Cacto::Cacto() : Planta(0, 0) {
@@ -36,12 +31,13 @@ bool Cacto::tentarMultiplicar(Jardim* jardim, int lin, int col) {
     if (agua_interna <= 50 || nutrientes_interna <= 100) return false;
 
     int dirs[4][2] = { {-1,0}, {1,0}, {0,-1}, {0,1} };
-    for (auto& d : dirs) {
-        int nl = lin + d[0], nc = col + d[1];
+    for (int i = 0; i < 4; ++i) { // Loop C++ clássico
+        int nl = lin + dirs[i][0];
+        int nc = col + dirs[i][1];
         if (jardim->posicaoValida(nl, nc) &&
             jardim->getCelula(nl, nc).getPlanta() == nullptr) {
 
-            // Criar novo cacto
+            // novo cacto
             Cacto* novo = new Cacto();
             novo->agua_interna = agua_interna / 2;
             novo->nutrientes_interna = nutrientes_interna / 2;
@@ -65,7 +61,9 @@ void Cacto::atualizar(Jardim* jardim, int lin, int col) {
 
     // 1. Absorção: 25% da água + até 5 nutrientes
     int absorve_agua = (agua_solo * 25) / 100;
-    int absorve_nut = std::min(5, nut_solo);
+
+    // CORRIGIDO: Substituído std::min
+    int absorve_nut = (5 < nut_solo ? 5 : nut_solo);
 
     agua_interna += absorve_agua;
     nutrientes_interna += absorve_nut;
