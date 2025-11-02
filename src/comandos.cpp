@@ -1,7 +1,6 @@
 #include "../include/comandos.h"
 #include <iostream>
 #include <sstream>
-// #include <vector> // REMOVIDO
 #include <cctype>
 #include <stdexcept>
 
@@ -26,18 +25,16 @@ Coordenadas Comando::stringParaPosicao(const std::string& pos) const {
     return resultado;
 }
 
-// Assinatura alterada para bool
 bool Comando::processar(const string& comando) {
     if (comando.empty()) return true; // Continua o loop
 
-    // NOVO: Parsing com array estático
-    const int MAX_TOKENS = 5; // Limite seguro de palavras por comando
+    // Parsing com array estático
+    const int MAX_TOKENS = 5;
     string tokens[MAX_TOKENS];
     int numTokens = 0;
 
     stringstream ss(comando);
     string token;
-    // Preenche o array de tokens
     while (numTokens < MAX_TOKENS && ss >> token) {
         tokens[numTokens] = token;
         numTokens++;
@@ -45,7 +42,6 @@ bool Comando::processar(const string& comando) {
     if (numTokens == 0) return true;
 
     string nomeComando = tokens[0];
-
     // --- 1. VALIDAÇÃO: Comando 'jardim <n> <n>' ---
     if (nomeComando == "jardim") {
         if (jardim != nullptr) {
@@ -71,27 +67,24 @@ bool Comando::processar(const string& comando) {
         }
         return true;
     }
-
     // --- 2. VALIDAÇÃO: Comando 'sair' ---
     if (nomeComando == "sair") {
         if (numTokens != 1) {
-             cout << "Erro: O comando 'sair' nao aceita parametros." << endl;
-             return true;
+            cout << "Erro: O comando 'sair' nao aceita parametros." << endl;
+            return true;
         }
         cout << "Simulacao encerrada. Obrigado!" << endl;
-        return false; // <<< ALTERADO: Termina o loop no main
+        return false; // Termina o loop no main
     }
-
     // --- VERIFICAÇÃO: JARDIM EXISTENTE ---
     if (jardim == nullptr) {
         cout << "Erro: O jardim ainda nao foi criado. Execute 'jardim <L> <C>' primeiro." << endl;
         return true;
     }
-
     // --- 3. VALIDAÇÃO: Comando 'entra <l><c>' ---
     if (nomeComando == "entra") {
         if (numTokens != 2) {
-            cout << "Sintaxe invalida para 'entra'. Uso correto: entra <posicao>" << endl;
+            cout << "Sintaxe invalida para 'entra'. Uso correto: entra <posicao> (ex: entra fg)" << endl;
             return true;
         }
         string posString = tokens[1];
@@ -108,8 +101,7 @@ bool Comando::processar(const string& comando) {
         cout << "Validado! Jardineiro pronto para entrar na posicao " << posString << "." << endl;
         jardim->imprimir();
         return true;
-
-    // --- 4. VALIDAÇÃO: Comando 'avanca [n]' ---
+        // --- 4. VALIDAÇÃO: Comando 'avanca [n]' ---
     } else if (nomeComando == "avanca") {
         if (numTokens > 2) {
             cout << "Sintaxe invalida para 'avanca'. Uso correto: avanca [n]" << endl;
@@ -131,19 +123,82 @@ bool Comando::processar(const string& comando) {
         cout << "Validado! Avancando " << instantes << " instante(s)..." << endl;
         jardim->imprimir();
         return true;
-
+        // --- 5. VALIDAÇÃO: Comando 'planta <l><c> <tipo>'  ---
     } else if (nomeComando == "planta") {
+        // 1. Validação: Contagem (3 tokens)
         if (numTokens != 3) {
-            cout << "Erro: uso correto: planta <pos> <tipo>" << endl;
-            cout << "Exemplo: planta aa cacto" << endl;
+            cout << "Sintaxe invalida para 'planta'. Uso correto: planta <posicao> <tipo> (ex: planta fb c)" << endl;
             return true;
         }
-        // ... (A lógica de validação do 'planta' viria aqui) ...
+        string posString = tokens[1];
+        string tipoString = tokens[2];
+        Coordenadas pos = stringParaPosicao(posString);
+        // 2. Validação: Posição (Sintaxe)
+        if (!pos.valida) {
+            cout << "Erro: Posicao '" << posString << "' em formato invalido. Use duas letras (ex: aa)." << endl;
+            return true;
+        }
+        // 3. Validação: Posição (Semântica - Limites)
+        if (!jardim->posicaoValida(pos.linha, pos.coluna)) {
+            cout << "Erro: Posicao '" << posString << "' esta fora dos limites do jardim." << endl;
+            return true;
+        }
+        // 4. Validação: Tipo de Planta
+        if (tipoString.length() != 1 || (tipoString != "c" && tipoString != "r" && tipoString != "e" && tipoString != "x")) {
+            cout << "Erro: Tipo de planta '" << tipoString << "' invalido. Use 'c', 'r', 'e' ou 'x'." << endl;
+            return true;
+        }
+
+        cout << "Validado! Planta '" << tipoString << "' pronta para ser plantada na posicao " << posString << "." << endl;
+        jardim->imprimir();
         return true;
+    }else if (nomeComando == "colhe") {
+        // 1. Validação: Contagem (2 tokens)
+        if (numTokens != 2) {
+            cout << "Sintaxe invalida para 'colhe'. Uso correto: colhe <posicao> (ex: colhe fb)" << endl;
+            return true;
+        }
+        string posString = tokens[1];
+        Coordenadas pos = stringParaPosicao(posString);
+        // 2. Validação: Posição (Sintaxe)
+        if (!pos.valida) {
+            cout << "Erro: Posicao '" << posString << "' em formato invalido. Use duas letras (ex: aa)." << endl;
+            return true;
+        }
+        // 3. Validação: Posição (Semântica - Limites)
+        if (!jardim->posicaoValida(pos.linha, pos.coluna)) {
+            cout << "Erro: Posicao '" << posString << "' esta fora dos limites do jardim." << endl;
+            return true;
+        }
+        // e verificar o limite de colheitas
+        cout << "Validado! Pronto para colher na posicao " << posString << "." << endl;
+        jardim->imprimir();
+        return true;
+        // --- 8. VALIDAÇÃO: Comando 'lplanta <l><c>' ---
+    } else if (nomeComando == "lplanta") {
+            // 1. Validação: Contagem (2 tokens)
+            if (numTokens != 2) {
+                cout << "Sintaxe invalida para 'lplanta'. Uso correto: lplanta <posicao> (ex: lplanta ej)" << endl;
+                return true;
+            }
+            string posString = tokens[1];
+            Coordenadas pos = stringParaPosicao(posString);
+            // 2. Validação: Posição (Sintaxe)
+            if (!pos.valida) {
+                cout << "Erro: Posicao '" << posString << "' em formato invalido. Use duas letras (ex: aa)." << endl;
+                return true;
+            }
+            // 3. Validação: Posição (Semântica - Limites)
+            if (!jardim->posicaoValida(pos.linha, pos.coluna)) {
+                cout << "Erro: Posicao '" << posString << "' esta fora dos limites do jardim." << endl;
+                return true;
+            }
+            cout << "Validado! Pronto para listar a planta na posicao " << posString << "." << endl;
 
-    } else {
-        cout << "Comando invalido! '" << nomeComando << "' nao e um comando reconhecido." << endl;
-    }
+            return true;
 
-    return true; // Garante que o loop continua
+        } else {
+            cout << "Comando invalido! '" << nomeComando << "' nao e um comando reconhecido." << endl;
+        }
+        return true;
 }
