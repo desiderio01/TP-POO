@@ -10,6 +10,6 @@ void TesouraPoda::usar(Jardim* jardim, int lin, int col) {
     Planta* p = cel.getPlanta();
 
     if (p != nullptr && p->eFeia()) {
-        cel.removerPlanta();  // delete interno
+        cel.removerPlanta();
     }
 }

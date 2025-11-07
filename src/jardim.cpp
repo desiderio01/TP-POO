@@ -1,7 +1,6 @@
 #include "../include/jardim.h"
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+
 #include "../include/Settings.h"
 #include "../include/jardineiro.h"
 #include "../include/planta.h"
@@ -19,11 +18,10 @@ Jardim::Jardim(int lin, int col) {
         grelha[i] = new Celula[colunas];
     }
     // Inicializa água e nutrientes aleatoriamente
-    srand(time(0));
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
-            grelha[i][j].setAgua(rand() % (Settings::Jardim::agua_max - Settings::Jardim::agua_min + 1) + Settings::Jardim::agua_min);
-            grelha[i][j].setNutrientes(rand() % (Settings::Jardim::nutrientes_max - Settings::Jardim::nutrientes_min + 1) + Settings::Jardim::nutrientes_min);
+            grelha[i][j].setAgua(Settings::Jardim::agua_max);
+            grelha[i][j].setNutrientes(Settings::Jardim::nutrientes_max);
         }
     }
 }
@@ -62,7 +60,6 @@ void Jardim::imprimir() {
 }
 
 void Jardim::atualizarInstante() {
-    // Lógica de Meta 2 (Simulação)
     for (int i = 0; i < linhas; i++) {
         for (int j = 0; j < colunas; j++) {
             Planta* p = grelha[i][j].getPlanta();

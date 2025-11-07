@@ -15,13 +15,12 @@ private:
     int capacidade;           // Tamanho alocado do array 'ferramentas'
 
     void redimensionar();
+    Jardineiro(const Jardineiro& outro);
+    Jardineiro& operator=(const Jardineiro& outro);
 
 public:
     Jardineiro(int lin, int col);
-    ~Jardineiro();
-
-    Jardineiro(const Jardineiro& outro) = delete;
-    Jardineiro& operator=(const Jardineiro& outro) = delete;
+    ~Jardineiro(); // O Destrutor já estava implementado (1/3 da Regra de 3)
 
     // Getters
     int getLinha() const { return linha; }
@@ -31,7 +30,7 @@ public:
     void mover(char direcao, int max_lin, int max_col);
     void entrar(int lin, int col);
 
-    // Ferramentas (assinaturas iguais, implementação muda)
+    // Ferramentas
     void adicionarFerramenta(Ferramenta* f);
     void usarFerramenta(Jardim* jardim);
     bool temFerramenta(const std::string& tipo) const;

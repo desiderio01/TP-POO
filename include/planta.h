@@ -12,7 +12,7 @@ protected:
 
 public:
     Planta(int agua_inicial, int nut_inicial);
-    virtual ~Planta() = default;
+    virtual ~Planta () {};
 
     virtual char getSimbolo() const = 0;
     virtual void atualizar(Jardim* jardim, int lin, int col) = 0;

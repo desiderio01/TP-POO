@@ -1,7 +1,6 @@
 #include "../include/comandos.h"
 #include <iostream>
 #include <sstream>
-#include <cctype>
 #include <stdexcept>
 
 using namespace std;
@@ -13,7 +12,7 @@ Comando::~Comando() {
 Coordenadas Comando::stringParaPosicao(const std::string& pos) const {
     Coordenadas resultado;
     if (pos.length() != 2) return resultado;
-    if (!std::islower(pos[0]) || !std::islower(pos[1])) {
+    if ((pos[0] < 'a' || pos[0] > 'z') || (pos[1] < 'a' || pos[1] > 'z')) {
         return resultado;
     }
     resultado.linha = pos[0] - 'a';
@@ -52,23 +51,29 @@ bool Comando::processar(const string& comando) {
             cout << "Sintaxe invalida para 'jardim'. Uso correto: jardim <linhas> <colunas>" << endl;
             return true;
         }
-        try {
-            int linhas = stoi(tokens[1]);
-            int colunas = stoi(tokens[2]);
-            if (linhas < 1 || linhas > 26 || colunas < 1 || colunas > 26) {
-                cout << "Erro: Dimensoes invalidas! Insira valores entre 1 e 26." << endl;
-                return true;
-            }
-            jardim = new Jardim(linhas, colunas);
-            cout << "\nJardim criado com sucesso: " << linhas << "x" << colunas << "." << endl;
-            jardim->imprimir();
-        } catch (const std::exception& e) {
+        int linhas, colunas;
+        stringstream ss_linhas(tokens[1]);
+        stringstream ss_colunas(tokens[2]);
+
+        // Tenta extrair os números. Se falhar (ou se sobrar lixo, ex: "10a") dá erro.
+        if (!(ss_linhas >> linhas) || !(ss_colunas >> colunas) || !ss_linhas.eof() || !ss_colunas.eof()) {
             cout << "Erro de sintaxe: As dimensoes devem ser numeros inteiros." << endl;
+            return true;
         }
+
+        // Lógica original de validação
+        if (linhas < 1 || linhas > 26 || colunas < 1 || colunas > 26) {
+            cout << "Erro: Dimensoes invalidas! Insira valores entre 1 e 26." << endl;
+            return true;
+        }
+        jardim = new Jardim(linhas, colunas);
+        cout << "\nJardim criado com sucesso: " << linhas << "x" << colunas << "." << endl;
+        jardim->imprimir();
         return true;
     }
     // --- 2. VALIDAÇÃO: Comando 'sair' e 'fim' ---
     if (nomeComando == "sair" || nomeComando == "fim") { //
+
         if (numTokens != 1) {
             cout << "Erro: O comando '" << nomeComando << "' nao aceita parametros." << endl;
             return true;
@@ -121,14 +126,15 @@ bool Comando::processar(const string& comando) {
         }
         int instantes = 1;
         if (numTokens == 2) {
-            try {
-                instantes = stoi(tokens[1]);
-                if (instantes <= 0) {
-                    cout << "Erro: O numero de instantes deve ser um valor inteiro positivo." << endl;
-                    return true;
-                }
-            } catch (const std::exception& e) {
+            stringstream ss_instantes(tokens[1]);
+
+            if (!(ss_instantes >> instantes) || !ss_instantes.eof()) {
                 cout << "Erro: O parametro para 'avanca' deve ser um numero inteiro." << endl;
+                return true;
+            }
+
+            if (instantes <= 0) {
+                cout << "Erro: O numero de instantes deve ser um valor inteiro positivo." << endl;
                 return true;
             }
         }
@@ -295,6 +301,5 @@ bool Comando::processar(const string& comando) {
     } else {
         cout << "Comando invalido! '" << nomeComando << "' nao e um comando reconhecido." << endl;
     }
-
     return true; // Garante que o loop continua
 }

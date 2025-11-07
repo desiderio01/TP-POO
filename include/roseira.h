@@ -18,7 +18,7 @@ public:
     Roseira();
 
     // Funções obrigatórias da classe base (atualizar deve ter os parâmetros para acesso ao Jardim)
-    char getSimbolo() const override { return 'R'; }
+    char getSimbolo() const override { return 'r'; }
     // O seu Roseira.cpp usa Roseira::atualizar(Jardim* jardim, int lin, int col), ajustando a assinatura aqui.
     void atualizar(Jardim* jardim, int lin, int col) override;
 
